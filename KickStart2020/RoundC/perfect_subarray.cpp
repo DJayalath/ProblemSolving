@@ -16,30 +16,23 @@ void solve() {
     int arr[N];
 
     for (int i = 0; i < N; i++)
-        cin >> arr[N];
-
-    int p_N = pow(2, N); // Size of powerset
+        cin >> arr[i];
 
     int ans = 0;
-    
-    // Loop over powerset
-    int c; // Binary counter
-    for (c = 0; c < p_N; c++) {
 
-        int sum = 0;
-        for (int i = 0; i < N; i++) {
-
-            // If ith bit is set, ith element is part of subset
-            if (c & (1 << i)) {
-                sum += arr[i];
+    // Loop over subarrays
+    for (int i = 0; i < N; i++) {
+        for (int j = i; j < N; j++) {
+            int sum = 0;
+            for (int k = i; k <= j; k++) {
+                sum += arr[k];
             }
-
+            if (p_square(sum))
+                ans++;
         }
-
-        if (p_square(sum))
-            ans++;
-
     }
+    
+
 
     cout << ans << endl;
 
