@@ -1,14 +1,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-int c[20000001]; // Frequency of totals
-
-bool p_square(int n) {
-    if (n < 0)
-        return false;
-    int isqrt = round(sqrt(n));
-    return n == isqrt * isqrt;
-}
+int f[20000001];
 
 void solve() {
 
@@ -28,27 +21,31 @@ void solve() {
     }
 
     long long ans = 0;
-    int t = 0;
-    c[s_neg]++;
-    for (int i = 0; i < N; i++) {
 
+    f[s_neg]++;
+    int t = 0;
+    for (int i = 0; i < N; i++) {
+            
         t += arr[i];
 
-        // examine subarrays with perfect square sum
-        // if subarray has sum j*j for array t then
-        // total sum to this point is (s_neg +) t - j*j
-        // (if indexable) add the count of this sum to number of answers
         for (int j = 0; j*j <= s_pos; j++) {
-            if (s_neg + (t - j*j) >= 0)
-                ans += c[s_neg + (t - j*j)];
+            
+            // t - j*j is cumulative total up to start of perfect
+            // square subarray of sum j*j if it exists
+            if (s_neg + t - j*j >= 0) // Check indexable
+                ans += f[s_neg + t - j*j]; // Add frequency of this sum
+
         }
 
-        c[s_neg + t]++; // Add one to frequency of this total
+        // Added here so that longer partial array totals aren't
+        // counted accidentally at this point in the search
+        f[s_neg + t]++; // Increment count of this total
+
     }
 
     cout << ans << endl;
 
-    memset(c, 0, sizeof(int) * (s_neg + s_pos + 1));
+    memset(f, 0, sizeof(int) * (s_neg + s_pos + 1));
 
 }
 
