@@ -5,7 +5,7 @@ bool p_square(int n) {
     if (n < 0)
         return false;
     int isqrt = round(sqrt(n));
-    return n == root * root;
+    return n == isqrt * isqrt;
 }
 
 void solve() {
