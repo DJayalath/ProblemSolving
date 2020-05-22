@@ -3,49 +3,70 @@ using namespace std;
 
 #define MAX 200001
 
-// Cumulative sums
-long long f0[MAX]; // +A0 -A1 +A2 -A3 ...
-long long f0_m[MAX]; // +0 * A0 -1 * A1 +2 * A2 ...
+// Cumulative sums encoded in Fenwick trees
+long long f0[MAX]; // +A1 -A2 +A3 -A4 ...
+long long f0_m[MAX]; // +1 * A1 -2 * A2 +3 * A1 ...
 
-long long f1[MAX]; // -A0 +A1 -A2 +A3 ...
-long long f1_m[MAX]; // -0 * A0 +1 * A1 -2 * A2 ...
+long long f1[MAX]; // -A1 +A2 -A3 +A4 ...
+long long f1_m[MAX]; // -1 * A1 +2 * A2 -3 * A3 ...
 
-void reset(int N) {
+long long arr[MAX];
+
+int N;
+
+// Reset
+void reset() {
     memset(f0, 0, sizeof(long long) * (N + 1));
     memset(f0_m, 0, sizeof(long long) * (N + 1));
     memset(f1, 0, sizeof(long long) * (N + 1));
     memset(f1_m, 0, sizeof(long long) * (N + 1));
+    memset(arr, 0, sizeof(long long) * (N + 1));
+}
+
+// Update
+void upd(int i, long long x, long long f[]) {
+    for (; i <= N; i += i & -i)
+        f[i] += x;
+}
+
+// Query
+long long qry(int i, long long f[]) {
+    long long t = 0;
+    for (; i; i -= i & -i)
+        t += f[i];
+    return t;
+}
+
+void apply(int i, long long x) {
+
+    if (i & 1) {
+        upd(i, x - arr[i], f0);
+        upd(i, i * (x - arr[i]), f0_m);
+        upd(i, -(x - arr[i]), f1);
+        upd(i, -i * (x - arr[i]), f1_m);
+    } else {
+        upd(i, -(x - arr[i]), f0);
+        upd(i, -i * (x - arr[i]), f0_m);
+        upd(i, x - arr[i], f1);
+        upd(i, i * (x - arr[i]), f1_m);
+    }
+
+    arr[i] = x;
 }
 
 void solve() {
     
-    int N, Q;
+    int Q;
     cin >> N >> Q;
 
-    reset(N);
-
-    long long arr[N + 1];
-    arr[0] = 0;
+    reset();
 
     for (int i = 1; i < N + 1; i++) {
 
-        long long a;
-        cin >> a;
-        arr[i] = a;
-
-        if (i & 1) {
-            f0[i] = f0[i - 1] + a;
-            f0_m[i] = f0_m[i - 1] + i * a;
-
-            f1[i] = f1[i - 1] - a;
-            f1_m[i] = f1_m[i - 1] - i * a;
-        } else {
-            f0[i] = f0[i - 1] - a;
-            f0_m[i] = f0_m[i - 1] - i * a;
-
-            f1[i] = f1[i - 1] + a;
-            f1_m[i] = f1_m[i - 1] + i * a;
-        }
+        long long x;
+        cin >> x;
+        
+        apply(i, x);
 
     }
    
@@ -55,36 +76,26 @@ void solve() {
     int x, y;
     for (int k = 0; k < Q; k++) {
         
-        cin >> op >> x >> y;
+        cin >> op;
   
         if (op == 'Q') { // Query
 
+            int x, y;
+            cin >> x >> y;
+
             if (x & 1) {
-                swt += (f0_m[y] - f0_m[x - 1]) - (x - 1) * (f0[y] - f0[x - 1]);
+                swt += (qry(y, f0_m) - qry(x - 1, f0_m)) - (x - 1) * (qry(y, f0) - qry(x - 1, f0));
             } else {
-                swt += (f1_m[y] - f1_m[x - 1]) - (x - 1) * (f1[y] - f1[x - 1]);            
+                swt += (qry(y, f1_m) - qry(x - 1, f1_m)) - (x - 1) * (qry(y, f1) - qry(x - 1, f1));            
             }
         
         } else { // Update
            
-            arr[x] = y;
+            int i;
+            long long x;
+            cin >> i >> x;
 
-            for (int i = x; i < N + 1; i++) {
-
-                if (i & 1) {
-                    f0[i] = f0[i - 1] + arr[i];
-                    f0_m[i] = f0_m[i - 1] + i * arr[i];
-
-                    f1[i] = f1[i - 1] - arr[i];
-                    f1_m[i] = f1_m[i - 1] - i * arr[i];
-                } else {
-                    f0[i] = f0[i - 1] - arr[i];
-                    f0_m[i] = f0_m[i - 1] - i * arr[i];
-
-                    f1[i] = f1[i - 1] + arr[i];
-                    f1_m[i] = f1_m[i - 1] + i * arr[i];
-                }
-            }
+            apply(i, x);
             
         }
         
