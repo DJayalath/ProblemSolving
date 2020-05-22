@@ -7,10 +7,8 @@ void solve() {
     cin >> N >> Q;
     
     int m_vals[N]; // Array of multiplied staggered sums
-    int m_vals_mirr[N]; // Mirror version (-1 = +1)
-    int m_val_cum[N][N];
+    vector<int> m_cum[N]; // Cumulative staggered sums
     memset(m_vals, 0, sizeof(m_vals));
-    memset(m_vals_mirr, 0, sizeof(m_vals_mirr));
     
     int arr[N];
     for (int i = 0; i < N; i++) {
@@ -18,12 +16,11 @@ void solve() {
         for (int j = 0; j <= i; j++) {
             if ((i - j) & 1) {
                 m_vals[j] += -(i - j + 1) * arr[i];
-                m_vals_mirr[j] += (i - j + 1) * arr[i];
             } // Odd --> -ve mult
             else {
                 m_vals[j] += (i - j + 1) * arr[i];
-                m_vals_mirr[j] += -(i - j + 1) * arr[i];
             }
+            m_cum[j].push_back(m_vals[j]);
         }
     }
 
@@ -40,19 +37,31 @@ void solve() {
         
         if (op == 'Q') { // Query
         
-            if ((b - a) & 1) {
-                cout << m_vals[a - 1] << " MINUS " << m_vals[b] << endl;
-                swt += m_vals[a - 1] - m_vals[b];
-
-            }
-            else {
-                cout << m_vals[a - 1] << " MINUS " << m_vals_mirr[b] << endl;
-                swt += m_vals[a - 1] - m_vals_mirr[b];
-
-            }            
+            //if ((b - a) & 1) {
+                //cout << m_vals[a - 1] << " MINUS " << m_vals[b] << endl;
+                //swt += m_vals[a - 1] - m_vals[b];
+                    swt += m_cum[a - 1][b - a];
+           //}
+        
         } else { // Update
             
             arr[a - 1] = b;
+
+            for (int j = 0; j < N; j++) {
+                m_vals[j] = 0;
+                m_cum[j].clear();
+            }
+
+            for (int i = 0; i < N; i++) {
+                for (int j = 0; j <= i; j++) {
+                    if((i - j) & 1) {
+                        m_vals[j] += -(i - j + 1) * arr[i];
+                    } else {
+                        m_vals[j] += (i - j + 1) * arr[i];
+                    }
+                    m_cum[j].push_back(m_vals[j]);
+                }
+            }
             
         }
         
