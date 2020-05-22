@@ -4,17 +4,17 @@ using namespace std;
 #define MAX 200001
 
 // Cumulative sums
-int f0[MAX]; // +A0 -A1 +A2 -A3 ...
-int f0_m[MAX]; // +0 * A0 -1 * A1 +2 * A2 ...
+long long f0[MAX]; // +A0 -A1 +A2 -A3 ...
+long long f0_m[MAX]; // +0 * A0 -1 * A1 +2 * A2 ...
 
-int f1[MAX]; // -A0 +A1 -A2 +A3 ...
-int f1_m[MAX]; // -0 * A0 +1 * A1 -2 * A2 ...
+long long f1[MAX]; // -A0 +A1 -A2 +A3 ...
+long long f1_m[MAX]; // -0 * A0 +1 * A1 -2 * A2 ...
 
 void reset(int N) {
-    memset(f0, 0, sizeof(int) * (N + 1));
-    memset(f0_m, 0, sizeof(int) * (N + 1));
-    memset(f1, 0, sizeof(int) * (N + 1));
-    memset(f1_m, 0, sizeof(int) * (N + 1));
+    memset(f0, 0, sizeof(long long) * (N + 1));
+    memset(f0_m, 0, sizeof(long long) * (N + 1));
+    memset(f1, 0, sizeof(long long) * (N + 1));
+    memset(f1_m, 0, sizeof(long long) * (N + 1));
 }
 
 void solve() {
@@ -24,12 +24,12 @@ void solve() {
 
     reset(N);
 
-    int arr[N + 1];
+    long long arr[N + 1];
     arr[0] = 0;
 
     for (int i = 1; i < N + 1; i++) {
 
-        int a;
+        long long a;
         cin >> a;
         arr[i] = a;
 
