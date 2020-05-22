@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-#define MAX 200000
+#define MAX 200001
 
 // Cumulative sums
 int f0[MAX]; // +A0 -A1 +A2 -A3 ...
@@ -11,10 +11,10 @@ int f1[MAX]; // -A0 +A1 -A2 +A3 ...
 int f1_m[MAX]; // -0 * A0 +1 * A1 -2 * A2 ...
 
 void reset(int N) {
-    memset(f0, 0, 4 * N);
-    memset(f0_m, 0, 4 * N);
-    memset(f1, 0, 4 * N);
-    memset(f1_m, 0, 4 * N);
+    memset(f0, 0, sizeof(int) * (N + 1));
+    memset(f0_m, 0, sizeof(int) * (N + 1));
+    memset(f1, 0, sizeof(int) * (N + 1));
+    memset(f1_m, 0, sizeof(int) * (N + 1));
 }
 
 void solve() {
@@ -24,31 +24,28 @@ void solve() {
 
     reset(N);
 
-    int arr[N];
-    int a = 0;
-    int b = 0;
-    int c = 0;
-    int d = 0;
-    for (int i = 0; i < N; i++) {
+    int arr[N + 1];
+    arr[0] = 0;
 
-        cin >> arr[i];
+    for (int i = 1; i < N + 1; i++) {
+
+        int a;
+        cin >> a;
+        arr[i] = a;
 
         if (i & 1) {
-            a += -arr[i];
-            b += -i * arr[i];
-            c += arr[i];
-            d += i * arr[i];
-        } else {
-            a += arr[i];
-            b += i * arr[i];
-            c += -arr[i];
-            d += -i * arr[i];
-        }
+            f0[i] = f0[i - 1] + a;
+            f0_m[i] = f0_m[i - 1] + i * a;
 
-        f0[i] = a;
-        f0_m[i] = b;
-        f1[i] = c;
-        f1_m[i] = d;
+            f1[i] = f1[i - 1] - a;
+            f1_m[i] = f1_m[i - 1] - i * a;
+        } else {
+            f0[i] = f0[i - 1] - a;
+            f0_m[i] = f0_m[i - 1] - i * a;
+
+            f1[i] = f1[i - 1] + a;
+            f1_m[i] = f1_m[i - 1] + i * a;
+        }
 
     }
    
@@ -56,69 +53,37 @@ void solve() {
     
     char op;
     int x, y;
-    for (int i = 0; i < Q; i++) {
+    for (int k = 0; k < Q; k++) {
         
         cin >> op >> x >> y;
-
-        // Index correction
-        x--;
-        y--;
-        
+  
         if (op == 'Q') { // Query
 
             if (x & 1) {
-                int u = 0;
-                int v = 0;
-                if (x - 1 >= 0) {
-                    u = f1_m[x - 1];
-                    v = f1[x - 1];
-                }
-                swt += (f1_m[y] - u) - (x - 1) * (f1[y] - v); // CHECK BELOW ZERO
+                swt += (f0_m[y] - f0_m[x - 1]) - (x - 1) * (f0[y] - f0[x - 1]);
             } else {
-                int u = 0;
-                int v = 0;
-                if (x - 1 >= 0) {
-                    u = f0_m[x - 1];
-                    v = f0[x - 1];
-                }
-                swt += (f0_m[y] - u) - (x - 1) * (f0[y] - v);
+                swt += (f1_m[y] - f1_m[x - 1]) - (x - 1) * (f1[y] - f1[x - 1]);            
             }
         
         } else { // Update
            
-            y++;
             arr[x] = y;
 
-            if (x - 1 >= 0) {
-                a = f0[x - 1];
-                b = f0_m[x - 1];
-                c = f1[x - 1];
-                d = f1_m[x - 1];
-            } else {
-                a = 0;
-                b = 0;
-                c = 0;
-                d = 0;
-            }
-            for (int i = x; i < N; i++) {
-               
+            for (int i = x; i < N + 1; i++) {
+
                 if (i & 1) {
-                    a += -arr[i];
-                    b += -i * arr[i];
-                    c += arr[i];
-                    d += i * arr[i];
+                    f0[i] = f0[i - 1] + arr[i];
+                    f0_m[i] = f0_m[i - 1] + i * arr[i];
+
+                    f1[i] = f1[i - 1] - arr[i];
+                    f1_m[i] = f1_m[i - 1] - i * arr[i];
                 } else {
-                    a += arr[i];
-                    b += i * arr[i];
-                    c += -arr[i];
-                    d += -i * arr[i];
+                    f0[i] = f0[i - 1] - arr[i];
+                    f0_m[i] = f0_m[i - 1] - i * arr[i];
+
+                    f1[i] = f1[i - 1] + arr[i];
+                    f1_m[i] = f1_m[i - 1] + i * arr[i];
                 }
-
-                f0[i] = a;
-                f0_m[i] = b;
-                f1[i] = c;
-                f1_m[i] = d;
-
             }
             
         }
