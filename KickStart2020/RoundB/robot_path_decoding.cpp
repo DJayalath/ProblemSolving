@@ -13,42 +13,32 @@ vector<ll> rstk; // Repetition stack
 
 void solve() {
     
-    w = 1;
-    h = 1;
+    w = 0;
+    h = 0;
 
     cin >> prog;
 
     for (char c : prog) {
         if (c >= '2' && c <= '9') {
             ll r = c - '0';
-            rstk.push_back(r * rstk.back());
+            rstk.push_back(rstk.back() * R % MAX);
         }
         else if (c == ')') {
             rstk.pop_back();
         }
         else if (c != '(') {
             if (c == 'N')
-                h -= rstk.back();
+                h = ((h - rstk.back()) % MAX + MAX) % MAX;
             else if (c == 'S')
-                h += rstk.back();
+                h = (h + rstk.back()) % MAX;
             else if (c == 'W')
-                w -= rstk.back();
+                w = ((w - rstk.back()) % MAX + MAX) % MAX;
             else if (c == 'E')
-                w += rstk.back();
+                w = (w + rstk.back()) % MAX;
         }
     }
 
-    if (h > MAX)
-        h = h - MAX;
-    else if (h < 1)
-        h = MAX + h;
-
-    if (w > MAX)
-        w = w - MAX;
-    else if (w < 1)
-        w = MAX + w;
-
-    cout << w << " " << h << endl;
+    cout << ++w << " " << ++h << endl;
 
 }
 
