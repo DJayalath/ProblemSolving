@@ -1,20 +1,24 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+#define ld long double
+
 int W, H, L, U, R, D;
 
-int fact(int n) {
-    int t = 1;
+ld log2fact(int n) {
+    if (n == 0)
+        return log2((ld) 1.0);
+    ld t = 0.0;
     for (int i = 1; i <= n; i++)
-        t *= i;
+        t += log2((ld) i);
     return t;
 }
 
-double log2c(int n, int k) {
-    return log2(fact(n)) - log2(fact(k)) - log2(fact(n - k));
+ld log2c(int n, int k) {
+    return log2fact(n) - log2fact(k) - log2fact(n - k);
 }
 
-double log2path(int S, int E) {
+ld log2path(int S, int E) {
     return log2c(S + E, S) - S - E;
 }
 
@@ -26,10 +30,10 @@ void solve() {
     int m = L;
 
     // Examine bottom left
-    vector<double> p;
+    ld p = 0.0;
     while (m - 1 >= 1 && n + 1 <= H) {
         
-        p.push_back(log2path(n, m - 2));
+        p += pow(2, log2path(m - 2, n));
 
         n++;
         m--;
@@ -39,21 +43,15 @@ void solve() {
     n = U;
     m = R;
 
-    while (n - 1 >= 1 && m <= R) {
+    while (n - 1 >= 1 && m + 1 <= W) {
 
-        p.push_back(log2path(n - 2, m));
+        p += pow(2, log2path(n - 2, m));
 
         n--;
         m++;
     }
 
-    double t = 0;
-    for (double x : p) {
-        t += pow(2, x);
-    }
-
-
-    cout << t << endl;
+    cout << setprecision(9) << p << endl;
 
 }
 
